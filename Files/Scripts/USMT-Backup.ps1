@@ -24,38 +24,50 @@
     This script was written to accomodate Windows 7 PC's running PowerShell v2.0
 .EXAMPLE
     
-    PS C:\>.\USMT-Backup.exe - verified
+    PS C:\>.\USMT-Backup.exe
     This will launch the interactive version of the script via the executable.
 
-    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -usmtpath "C:\Temp\backup" - verified
+    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -usmtpath "C:\Temp\backup"
     This run of the executable will determine the currently logged on user and back up their data to C:\Temp\Backup\<username>_<computername>, sending an email to that user.
     
-    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -username contoso\usera -usmtpath "C:\Temp\backup" - verified
+    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -username contoso\usera -usmtpath "C:\Temp\backup"
     This run of the executable will determine the user running the executable, back up the data for the specified user to C:\Temp\Backup\<username>_<computername>, and 
     send an email to the running user as well as the backed up user.
     
-    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -usmtpath "C:\Temp\backup" -emailaddress "usera@contoso.com,userb@contoso.com" - verified
+    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -usmtpath "C:\Temp\backup" -emailaddress "usera@contoso.com,userb@contoso.com"
     This run of the executable will determine the currently logged on user and back up their data to C:\Temp\Backup\<username>_<computername>, sending an email to the running user as well as 
     to the email addresses provided.
     
-    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -usmtpath "C:\Temp\backup" -shared - verified
+    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -shared -usmtpath "C:\Temp\backup"
     This run of the executable will determine the currently logged on user or last logged on user, back up the data for all users of the machine to C:\Temp\Backup\<computername>, sending an email to the user.
     
-    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -usmtpath "C:\Temp\backup" -emailaddress "usera@contoso.com;userb@contoso.com" -shared -verified
+    PS C:\>.\USMT-Backup.exe -deploymode "Silent" -shared -usmtpath "C:\Temp\backup" -emailaddress "usera@contoso.com;userb@contoso.com" 
     This run of the executable will determine the currently logged on user or last logged on user, back up the data for all users of the machine to C:\Temp\Backup\<computername>, sending an email to the user
     as well as to the email addresses provided.
     
-    PS C:\>.\USMT-Backup.ps1 -silent -usmtpath "C:\Temp\Backup" -shared
-    This run of the executable will determine the currently logged on user or last logged on user, back up the data for all users of the machine to C:\Temp\Backup\<computername>, sending an email to the user.
+    PS C:\>.\USMT-Backup.ps1 -silent -usmtpath "C:\Temp\Backup"
+    This run of the script will determine the currently logged on user and back up their data to C:\Temp\Backup\<username>_<computername>, sending an email to that user.
+
+    PS C:\>.\USMT-Backup.ps1 -silent -usmtpath "C:\Temp\Backup" -emailaddress "usera@contoso.com,userb@contoso.com"
+    This run of the script will determine the currently logged on user and back up their data to C:\Temp\Backup\<username>_<computername>, sending an email to that user
+    as well as to the email addresses provided.
+
+    PS C:\>.\USMT-Backup.ps1 -silent -shared -usmtpath "C:\Temp\Backup" 
+    This run of the script will determine the currently logged on user or last logged on user, back up the data for all users of the machine to C:\Temp\Backup\<computername>, sending an email to the user.
     
-    PS C:\>.\USMT-Backup.ps1 -usmtpath "C:\Temp\Backup" -silent - verified
-    Explanation of what the example does
+    PS C:\>.\USMT-Backup.ps1 -silent -shared -usmtpath "C:\Temp\Backup" -emailaddress "usera@contoso.com,userb@contoso.com"
+    This run of the script will determine the currently logged on user or last logged on user, back up the data for all users of the machine to C:\Temp\Backup\<computername>, sending an email to the logged
+    on user as well as to the email addresses provided.
     
-    PS C:\>.\USMT-Backup.ps1 -usmtpath "C:\Temp\Backup" -shared -silent
-    Explanation of what the example does
+    PS C:\>.\USMT-Backup.ps1 -silent -usmtpath "C:\Temp\Backup" -username "contoso\usera"
+    This run of the script will determine the user running the script, back up the data for the specified user to C:\Temp\Backup\<username>_<computername>, and 
+    send an email to the running user as well as the backed up user.
+
+    PS C:\>.\USMT-Backup.ps1 -silent -usmtpath "C:\Temp\Backup" -username "contoso\usera" -emailaddress "usera@contoso.com,userb@contoso.com"
+    This run of the script will determine the user running the executable, back up the data for the specified user to C:\Temp\Backup\<username>_<computername>, sending an email to the running user as well as 
+    to the email addresses provided.
     
-    PS C:\>.\USMT-Backup.ps1 -usmtpath "C:\Temp\Backup" -shared -silent
-    Explanation of what the example does
+
 .INPUTS
     Inputs (if any)
 .OUTPUTS
@@ -1775,7 +1787,7 @@ function Validate-FinalPath
     Write-Log "Beginning Validate-FinalPath function."
     $computername = $env:computername
     # Put together our backup path:
-    if($script:sharecheck)
+    if($script:sharecheck -eq $true)
     {
         # This is a shared machine, back up all users logged in within the last 90 days.
         if(($script:TSBP.endswith(":\"))){$script:USMTPath = "$script:TSBP$computername"}
@@ -1986,8 +1998,9 @@ function Run-WinForm
         $cancelbuttonhpad = $cancelbuttonh + 10
         $usertextwpad = $($objuserTextbox.width) + 20
 
-        if(!$script:sharecheck)
+        if($script:sharecheck -eq $false)
         {
+            write-log "The user field should be visible on the form."
             $objUserLabel.visible = $True
             $objUserTextBox.visible = $true
             $userlabeltop = $($objpathTextBox.bottom) + 5
@@ -2125,7 +2138,7 @@ function Run-WinForm
     {
         $script:TSBP = $objpathTextBox.Text
         write-log "The TSBackup Path is $script:TSBP"
-        if(!$script:sharecheck)
+        if($script:sharecheck -eq $false)
         {
             $callinguser = $username
             $backedupuser = $objuserTextBox.Text
@@ -2215,7 +2228,7 @@ function Run-WinForm
     $objpathLabel.Size = '280,20'
     $objpathLabel.Text = "Please enter the USMT Backup Path:"
 
-    if(!$script:sharecheck)
+    if($script:sharecheck -eq $false)
     {
         # Customize our User Text Box and Label
         # User Text Box
@@ -2734,17 +2747,17 @@ function Environment-Check
                 {
                     "Yes" {
                             write-log "This is a shared machine"
-                            $script:sharecheck=$true
+                            $script:sharecheck = $true
                     }
                     "No" {
                         write-log "This is not a shared machine"
-                            $script:sharecheck=$false
+                            $script:sharecheck = $false
                     }
                 }
             }
             else {
                 write-log "Run with the shared switch, no need to check."
-                $script:sharecheck=$true
+                $script:sharecheck = $true
             }
             
             # Determine our backup type
@@ -2808,7 +2821,7 @@ function Environment-Check
                 if(!$script:shared)
                 {
                     write-log "Silent run of the script, no shared switch, setting sharedcheck to false."
-                    $script:sharecheck=$false
+                    $script:sharecheck = $false
                     $callinguser = $procuser
                     $backedupuser = $username
                     if($callinguser -ne $backedupuser)
@@ -2856,7 +2869,7 @@ function Environment-Check
                 else {
                     write-log "Silent run of the script using shared switch, setting sharedcheck to true."
                     $TSSUN = $username.split('\')[1]
-                    $script:sharecheck=$true
+                    $script:sharecheck = $true
                     $emadds = "$TSSUN@monsanto.com"
                     # Check the USMTPath and glue it together 
                     if(($USMTPath.endswith(":\"))){$USMTPath = "$USMTPath$computername"}
@@ -3019,8 +3032,11 @@ function Environment-Check
         $chkdskgo = $true
         $script:localchkgo = $true
         $BackupType = Get-RegistryValue -Path $RegRebootPath -Value $BackupTypeKey
-        $script:sharecheck = Get-RegistryValue -Path $RegRebootPath -Name $SharedKey
-        $script:username = Get-RegistryValue -Path $RegRebootPath -Name $UserKey
+        write-log "Our backup type is $BackupType"
+        $script:sharecheck = Get-RegistryValue -Path $RegRebootPath -Value $SharedKey
+        write-log "Our sharecheck value is set to $script:sharecheck"
+        $script:username = Get-RegistryValue -Path $RegRebootPath -Value $UserKey
+        write-log "Our username is $script:username"
         # Check to see if we need to run Drive-Check
         if($BackupType -eq "Local")
         {
