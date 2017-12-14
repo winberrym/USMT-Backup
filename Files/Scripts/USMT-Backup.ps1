@@ -593,7 +593,7 @@ function Confirm-Cancel
 {
     # Make sure that the user really wants to cancel.
     Write-Log "Prompting for Cancel Confirmation."
-    $title = "Monsanto User Data Backup - Cancel?"
+    $title = "Contoso User Data Backup - Cancel?"
     $options = "YesNo"
     $style = "Question"
     $message = "You have chosen to Cancel.  Canceling now may result in additional reboots if you choose to run the Backup tool again.`n`nClick Yes to Cancel, or No to Retry." 
@@ -970,7 +970,7 @@ function Final-Cleanup
         {
             Write-Log "Generating Popup Options"
             # Bad Pop Up options
-            $title = "Monsanto User Data Backup - Incomplete"
+            $title = "Contoso User Data Backup - Incomplete"
             $message = "The User Data Capture Process was interrupted."
         }
     }
@@ -995,7 +995,7 @@ function Final-Cleanup
         $sizestring = "The total compressed size of the captured data was $totalsize"
         write-log $sizestring
         # Good Pop Up options
-        $title = "Monsanto User Data Backup - Capture State Complete"
+        $title = "Contoso User Data Backup - Capture State Complete"
         $message = "The User Data Capture Process is complete."
         $message = "$message`n$timestring`n$sizestring"
 
@@ -1018,7 +1018,7 @@ function Final-Cleanup
 
     # Clean up the registry keys.
     Write-Log "Cleaning up registry keys."
-    $usmtpol = "HKLM:\Software\Monsanto\USMT"
+    $usmtpol = "HKLM:\Software\Contoso\USMT"
     Remove-Item -Path $usmtpol -Recurse -Force
 
     # Move the logfiles to the USMT Backup Folder
@@ -1141,7 +1141,7 @@ function Final-Cleanup
         }
         # Because we had to stow the backup_complete_email log file in the users documents, we'll need to enumerate that and include it.
         $defaultdocspath = "C:\Users\$($script:loguser)\Documents"
-        $oneddocspath = "C:\Users\$($script:loguser)\OneDrive - Monsanto\Migrated from My PC\Documents"
+        $oneddocspath = "C:\Users\$($script:loguser)\OneDrive - Contoso\Migrated from My PC\Documents"
         if(!(test-path $defaultdocspath))
         {
             Write-Log "The default desktop path $defaultdocspath does not exist, checking for OneDrive redirected desktop." -LogLevel 2
@@ -1503,7 +1503,7 @@ function Unblock-USB
 # Function Drive-Check (FDC)
 function Drive-Check {
     Write-Log "Prompting for disk insertion."
-    $title = "Monsanto User Data Backup - Insert USB Drive"
+    $title = "Contoso User Data Backup - Insert USB Drive"
     $options = "OK"
     $style = "Information"
     $message = "Temporary Access to removable USB drives has been granted.  Please insert your removable USB Drive now.  Detecting your drive may take up to a minute."
@@ -2146,9 +2146,9 @@ function Run-WinForm
             {
                 # The machine is being backed up for the owner by another user, likely a tech.  Include them in the email.
                 $script:TSSUN = $backedupuser.split('\')[1]
-                $bupem = "$($TSSUN)@monsanto.com"
+                $bupem = "$($TSSUN)@Contoso.com"
                 $opun = $callinguser.split('\')[1]
-                $opem = "$($opun)@monsanto.com"
+                $opem = "$($opun)@Contoso.com"
                 $script:emailaddress = "$bupem;$opem"
                 write-log "The user running the tool is $opun, the user being backed up is $script:TSSUN"
                 $script:backedupuser = $backedupuser
@@ -2158,7 +2158,7 @@ function Run-WinForm
                 # The user is backing up their own data.
                 write-log "The Backed Up User is the current operator."
                 $script:TSSUN = $username.split('\')[1]
-                $bupem = "$($TSSUN)@monsanto.com"
+                $bupem = "$($TSSUN)@Contoso.com"
                 $script:emailaddress = "$bupem"
                 $script:backedupuser = $username
                 $script:loguser = $script:TSSUN
@@ -2166,7 +2166,7 @@ function Run-WinForm
         }
         else {
             # This is a shared machine backup, send the email to the username running the process
-            $script:emailaddress = "$($username.split('\')[1])@monsanto.com"
+            $script:emailaddress = "$($username.split('\')[1])@Contoso.com"
         }
         $WinForm.Close()
         $WinForm.Dispose()
@@ -2636,8 +2636,8 @@ function Environment-Check
     $usmtroot = "$approot\amd64"
 
     # Define our root registry key
-    $MonRegPath = "HKLM:\Software\Monsanto"
-    $RegRebootPath = "$MonRegPath\USMT"
+    $MyRegPath = "HKLM:\Software\Contoso"
+    $RegRebootPath = "$MyRegPath\USMT"
 
     # Set up variables for our registry key values
     $BackupTypeKey = "USMTBackupType"
@@ -2648,7 +2648,7 @@ function Environment-Check
     if(!$testrootpath)
     {
         # This is our first run
-        New-Item -Path $MonRegPath -Name USMT -Force | out-null
+        New-Item -Path $MyRegPath -Name USMT -Force | out-null
         $firstrun = $true
         $runcheck = "This is our first run."
     }
@@ -2738,7 +2738,7 @@ function Environment-Check
             {
                 # Not run with the shared switch, have to check.
                 write-log "Not run with the shared switch, have to check."
-                $title = "Monsanto User Data Backup - Shared Computer Usage"
+                $title = "Contoso User Data Backup - Shared Computer Usage"
                 $message = "Is this machine shared by multiple users on a regular basis?  If so, data from all users who have logged in within the last 90 days will be captured."
                 $options = "YesNo"
                 $style = "Question"
@@ -2761,7 +2761,7 @@ function Environment-Check
             }
             
             # Determine our backup type
-            $title = "Monsanto User Data Backup - USB Storage"
+            $title = "Contoso User Data Backup - USB Storage"
             $message = "Will the backup be stored on a USB or other removable drive, directly connected to this PC?  If you are backing up to a network location (i.e. \\server\share\backup), choose No."
             $options = "YesNo"
             $style = "Question"
@@ -2827,13 +2827,13 @@ function Environment-Check
                     if($callinguser -ne $backedupuser)
                     {
                         $TSSUN = $backedupuser.split('\')[1]
-                        $bupem = "$($TSSUN)@monsanto.com"
+                        $bupem = "$($TSSUN)@Contoso.com"
                         # Check to see if we're running the script as System
                         if($callinguser -ne "NT AUTHORITY\SYSTEM")
                         {
                             write-log "CallingUser is $callinguser, Backedup User is $backedupuser"
                             # The machine is being backed up manually for the owner by another user, likely a tech.  Include them in the email.
-                            $opem = "$($callinguser.split('\')[1])@monsanto.com"
+                            $opem = "$($callinguser.split('\')[1])@Contoso.com"
                             $emadds =$opem
                             $script:loguser = $opun
                         }
@@ -2841,7 +2841,7 @@ function Environment-Check
                             # The script is being run through the executable, or by SCCM, don't try to send an email to SYSTEM
                             if(-not [string]::IsNullOrEmpty($runninguser))
                             {
-                                $opem = "$($runninguser.split('\')[1])@monsanto.com"
+                                $opem = "$($runninguser.split('\')[1])@Contoso.com"
                                 $emadds = "$bupem;$opem"
                                 $script:loguser = $($runninguser.split('\')[1])
                             }
@@ -2857,7 +2857,7 @@ function Environment-Check
                         # The user is backing up their own data.
                         write-log "The Backed Up User is the current operator."
                         $TSSUN = $username.split('\')[1]
-                        $bupem = "$($TSSUN)@monsanto.com"
+                        $bupem = "$($TSSUN)@Contoso.com"
                         $emadds = $bupem
                         $script:backedupuser = $username
                         $script:loguser = $TSSUN
@@ -2870,7 +2870,7 @@ function Environment-Check
                     write-log "Silent run of the script using shared switch, setting sharedcheck to true."
                     $TSSUN = $username.split('\')[1]
                     $script:sharecheck = $true
-                    $emadds = "$TSSUN@monsanto.com"
+                    $emadds = "$TSSUN@Contoso.com"
                     # Check the USMTPath and glue it together 
                     if(($USMTPath.endswith(":\"))){$USMTPath = "$USMTPath$computername"}
                     else{$USMTPath = "$USMTPath\$computername"}
@@ -2939,7 +2939,7 @@ function Environment-Check
                         {
                             # We do.  Prompt to remove before beginning Unblock.
                             Write-Log "Prompting for removal of USB Drive."
-                            $title = "Monsanto User Data Backup - Remove USB Drive"
+                            $title = "Contoso User Data Backup - Remove USB Drive"
                             $options = "OK"
                             $style = "Warning"
                             $message = "A removable USB Drive has been detected.  If this is the drive that you intend to back up to, please remove it before clicking OK."
@@ -2951,7 +2951,7 @@ function Environment-Check
                                 # They haven't removed the USB Drive, so we'll need to reboot.
                                 Write-Log "There are still removeable drives plugged in despite the warning." -LogLevel 3
                                 Write-Log "Prompting the user again."
-                                $title = "Monsanto User Data Backup - Remove USB Drive"
+                                $title = "Contoso User Data Backup - Remove USB Drive"
                                 $options = "RebootRetryCancel"
                                 $style = "Warning"
                                 $message = "A removable USB Drive is still connected to the machine.  If this is the drive that you intend to back up to, please remove it and click Retry."
@@ -3000,7 +3000,7 @@ function Environment-Check
                             else
                             {
                                 Write-Log "USB Drive check failed.  We will most likely need to reboot." -LogLevel 2
-                                $title = "Monsanto User Data Backup - Reboot Required"
+                                $title = "Contoso User Data Backup - Reboot Required"
                                 $options = "OK"
                                 $style = "Warning"
                                 $message = "There was an issue with detecting your USB drive.  To enable USB storage access, the PC will be rebooted when you click OK."
@@ -3121,7 +3121,7 @@ function Environment-Check
 
             Write-Log "USBRebootNeeded returns $script:USBRebootNeeded and ChkDskRebootNeeded returns $ChkDskRebootNeeded"
             Write-Log "Prompting the User to confirm reboot"
-            $title = "Monsanto User Data Backup - Reboot Pending"
+            $title = "Contoso User Data Backup - Reboot Pending"
             $message = "This machine will need to be rebooted before the data backup process can continue."
             $message2 = "Please click Reboot in order to reboot, or Cancel in order to Cancel."
             $options = "RebootCancel"
