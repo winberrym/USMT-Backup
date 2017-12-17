@@ -2371,10 +2371,10 @@ function Compile-Scriptblocks
     # Check to see if this is a shared machine
     if($script:sharecheck)
     {
-        $lastargline = "/vsc /uel:90 /ue:*\*app-* /ue:*\*svc-* /ue:%COMPUTERNAME%\* /ue:*\*admin* /encrypt:AES_256 /key:M0n$@nt0!2o17"
+        $lastargline = "/vsc /uel:90 /ue:*\*app-* /ue:*\*svc-* /ue:%COMPUTERNAME%\* /ue:*\*admin* /encrypt:AES_256 /key:C0nt0s0!2o17"
     }
     else {
-        $lastargline = "/ue:*\* /ui:$backedupuser /encrypt:AES_256 /key:M0n$@nt0!2o17"
+        $lastargline = "/ue:*\* /ui:$backedupuser /encrypt:AES_256 /key:C0nt0s0!2o17"
     }
     # Set up our scriptblocks
     Write-Log "Compiling Scriptblocks for Scanstate Process"
